@@ -11,44 +11,31 @@ import {
 import { Provider, connect } from "react-redux";
 import { PersistGate } from "redux-persist/lib/integration/react";
 import configureStore from "./Store";
-
-updateText = (text) => {
-  return {
-    type: 'UPDATE',
-    payload: text
-  }
-}
+import HomeScreen from './Home';
+import DataComponent from './Detail'
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 
 const {store, persister} = configureStore();
 
-class DataComponent extends React.PureComponent {
-  onUpdateText = text => {
-    this.props.dispatch(updateText(text))
+const RootStack = createStackNavigator(
+  {
+    Home: HomeScreen,
+    Details: DataComponent,
+  },
+  {
+    initialRouteName: 'Home',
   }
-  render() {
-    return (
-      <View style={{padding: 24}}>
-        <TextInput style={{borderColor: 'black', borderWidth: 1}} onChangeText={this.onUpdateText}/>
-        <Text>{JSON.stringify(this.props.data)}</Text>
-        <Text>{JSON.stringify(this.props.persistData)}</Text>
-      </View>
-    )
-  }
-}
+);
 
-const mapStateTpProps = state => ({
-  data: state.data,
-  persistData: state.persistData
-});
-
-const ConnectedApp = connect(mapStateTpProps)(DataComponent);
+const AppContainer = createAppContainer(RootStack);
 
 export default class App extends React.PureComponent {
   render() {
     return (
       <Provider store={store}>
         <PersistGate persistor={persister}>
-          <ConnectedApp/>
+          <AppContainer/>
         </PersistGate>
       </Provider>
     )
